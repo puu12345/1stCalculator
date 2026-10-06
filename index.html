@@ -4,9 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เครื่องคิดเลข</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --font-thai: 'Prompt', sans-serif;
+      --font-digits: 'JetBrains Mono', Consolas, monospace;
+    }
     body {
-      font-family: sans-serif;
+      font-family: var(--font-thai);
       background: #f0f2f5;
       display: flex;
       justify-content: center;
@@ -24,11 +31,19 @@
     #display {
       width: 100%;
       box-sizing: border-box;
-      font-size: 24px;
+      font-family: var(--font-digits);
+      font-size: 28px;
+      font-weight: 600;
+      color: #222;
       padding: 10px;
       text-align: right;
       border: 1px solid #ccc;
       border-radius: 8px;
+    }
+    #display::placeholder {
+      font-family: var(--font-thai);
+      font-weight: 400;
+      font-size: 20px;
     }
     #result {
       min-height: 32px;
@@ -36,7 +51,14 @@
       font-size: 20px;
       text-align: right;
       color: #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-sizing: border-box;
     }
+    #result:empty { padding: 0; }
+    #result.special { background: #d4edda; color: #155724; }
+    #result.normal { background: #fce4ec; color: #880e4f; font-family: var(--font-digits); font-weight: 600; }
+    #result.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -97,9 +119,15 @@
       display.value += value;
     }
 
+    // type: 'special' = เขียวอ่อน, 'normal' = ชมพู, 'error' = แดงอ่อน
+    function showResult(text, type) {
+      result.textContent = text;
+      result.className = type || '';
+    }
+
     function clearAll() {
       display.value = '';
-      result.textContent = '';
+      showResult('');
     }
 
     function backspace() {
@@ -111,25 +139,25 @@
 
       // กรณีพิเศษ
       if (expression === '1+1') {
-        result.textContent = '1+1 ไม่ต้องเท่ากับ 2 ก็ได้';
+        showResult('1+1 ไม่ต้องเท่ากับ 2 ก็ได้', 'special');
         return;
       }
 
       // อนุญาตเฉพาะตัวเลข เครื่องหมาย + - * / . และวงเล็บ
       if (!/^[0-9+\-*/.()]+$/.test(expression)) {
-        result.textContent = 'ใส่ได้เฉพาะตัวเลขและเครื่องหมาย + - × ÷';
+        showResult('ใส่ได้เฉพาะตัวเลขและเครื่องหมาย + - × ÷', 'error');
         return;
       }
 
       try {
         const answer = Function('"use strict"; return (' + expression + ')')();
         if (!isFinite(answer)) {
-          result.textContent = 'คำนวณไม่ได้';
+          showResult('คำนวณไม่ได้', 'error');
         } else {
-          result.textContent = '= ' + answer;
+          showResult('= ' + answer, 'normal');
         }
       } catch (e) {
-        result.textContent = 'สูตรไม่ถูกต้อง';
+        showResult('สูตรไม่ถูกต้อง', 'error');
       }
     }
 
