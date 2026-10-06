@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เครื่องคิดเลข</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .calculator {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      width: 300px;
+    }
+    #display {
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 24px;
+      padding: 10px;
+      text-align: right;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #result {
+      min-height: 32px;
+      margin: 10px 0;
+      font-size: 20px;
+      text-align: right;
+      color: #333;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    button {
+      font-size: 20px;
+      padding: 14px 0;
+      border: none;
+      border-radius: 8px;
+      background: #e4e6eb;
+      cursor: pointer;
+    }
+    button:hover { background: #d0d3d9; }
+    .op { background: #ffb347; }
+    .eq { background: #4caf50; color: #fff; }
+    .clear { background: #f44336; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h2>เครื่องคิดเลข</h2>
+    <input id="display" type="text" placeholder="พิมพ์ เช่น 1+1">
+    <div id="result"></div>
+    <div class="buttons">
+      <button class="clear" onclick="clearAll()">C</button>
+      <button onclick="press('(')">(</button>
+      <button onclick="press(')')">)</button>
+      <button class="op" onclick="press('/')">÷</button>
+
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button class="op" onclick="press('*')">×</button>
+
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button class="op" onclick="press('-')">−</button>
+
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button class="op" onclick="press('+')">+</button>
+
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="backspace()">⌫</button>
+      <button class="eq" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const result = document.getElementById('result');
+
+    function press(value) {
+      display.value += value;
+    }
+
+    function clearAll() {
+      display.value = '';
+      result.textContent = '';
+    }
+
+    function backspace() {
+      display.value = display.value.slice(0, -1);
+    }
+
+    function calculate() {
+      const expression = display.value.replace(/\s+/g, '');
+
+      // กรณีพิเศษ
+      if (expression === '1+1') {
+        result.textContent = '1+1 ไม่ต้องเท่ากับ 2 ก็ได้';
+        return;
+      }
+
+      // อนุญาตเฉพาะตัวเลข เครื่องหมาย + - * / . และวงเล็บ
+      if (!/^[0-9+\-*/.()]+$/.test(expression)) {
+        result.textContent = 'ใส่ได้เฉพาะตัวเลขและเครื่องหมาย + - × ÷';
+        return;
+      }
+
+      try {
+        const answer = Function('"use strict"; return (' + expression + ')')();
+        if (!isFinite(answer)) {
+          result.textContent = 'คำนวณไม่ได้';
+        } else {
+          result.textContent = '= ' + answer;
+        }
+      } catch (e) {
+        result.textContent = 'สูตรไม่ถูกต้อง';
+      }
+    }
+
+    // กด Enter เพื่อคำนวณ
+    display.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') calculate();
+    });
+  </script>
+</body>
+</html>
